@@ -1,0 +1,12 @@
+<?php
+
+namespace App;
+use ProlificHue\ModelAuditLogger\Models\AuditTrailLog as ATL;
+
+class AuditTrailLog extends ATL
+{
+	public function __construct()
+	{
+		parent::__construct();
+	}
+}

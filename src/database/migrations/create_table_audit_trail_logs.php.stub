@@ -1,0 +1,80 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateTableAuditTrailLogs extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::connection($this->getConnectionName())->create($this->getTableName(), function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->ipAddress('ip_address');
+            $table->string('model_type');
+            $table->string('model_id');
+            $table->string('user_id');
+            $table->string('user_type');
+            $table->text('payload')->nullable();
+            $table->string('table')->nullable();
+            $table->text('remarks')->nullable();
+            $table->datetime('created_at');
+
+            $table->index(['model_id', 'model_type']);
+            $table->index(['user_id', 'user_type']);
+            $table->index('created_at');
+            $table->index('ip_address');
+        });
+
+        Schema::connection($this->getConnectionName())->create($this->getArchiveTableName(), function (Blueprint $table) {
+            $table->bigInteger('id');
+            $table->ipAddress('ip_address');
+            $table->string('model_type');
+            $table->string('model_id');
+            $table->string('user_id');
+            $table->string('user_type');
+            $table->text('payload')->nullable();
+            $table->string('table')->nullable();
+            $table->text('remarks')->nullable();
+            $table->datetime('created_at');
+            $table->datetime('archived_at');
+
+            $table->index(['model_id', 'model_type']);
+            $table->index(['user_id', 'user_type']);
+            $table->index('created_at');
+            $table->index('archived_at');
+            $table->index('ip_address');
+            $table->primary('id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::connection($this->getConnectionName())->dropIfExists($this->getTableName());
+    }
+
+    private function getArchiveTableName()
+    {
+        return config('modelauditlogger.drivers.database.archive_table');
+    }
+
+    private function getTableName()
+    {
+    	return config('modelauditlogger.drivers.database.table');
+    }
+
+    private function getConnectionName()
+    {
+    	return config('modelauditlogger.drivers.database.connection') ?? config('database.default');
+    }
+}
