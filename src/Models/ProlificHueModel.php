@@ -7,23 +7,50 @@ use Illuminate\Database\Eloquent\Model;
 use ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException;
 use ProlificHue\ModelAuditLogger\Rule;
 
-class ProlificHueModel // implements ModelInterface
+class ProlificHueModel implements ModelInterface
 {
+	/**
+	 * Illuminate\Support\Collection $items	
+	*/
 	private $items;
+
+	/**
+	 * Illuminate\Database\Eloquent\Model $model
+	*/
 	private $model;
+
+	/**
+	 * string $driver
+	*/
 	private $driver;
+
+	/**
+	 * array $queueActions
+	*/
 	private $queueActions = []; 
 
+	/**
+	 * @param string $driver
+	*/
 	private function __construct(string $driver)
 	{
 		$this->setDriver($driver);
 	}
 
+	/**
+	 * @param string $driver
+	 * @return self new instance
+	*/
 	public static function make(string $driver)
 	{
 		return new static($driver);
 	}
 
+	/**
+	 * @param string $driver
+	 * @throws \ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException
+	 * @return void
+	*/
 	public function setDriver(string $driver)
 	{
 		if($driver !== Rule::COLLECTION_DRIVER && $driver !== Rule::DB_DRIVER)
@@ -32,12 +59,18 @@ class ProlificHueModel // implements ModelInterface
 		$this->driver = $driver;	
 	}
 
+	/**
+	 * @return string $driver
+	*/
 	public function getDriver()
 	{
 		$this->isDriverSet();
 		return $this->driver;
 	}
 
+	/**
+	 * @throws \ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException
+	*/
 	private function isDriverSet()
 	{
 		if(empty( $this->driver ))
@@ -50,6 +83,10 @@ class ProlificHueModel // implements ModelInterface
 			throw new AuditLoggerException("Collection is not set.", 1);
 	}
 
+	/**
+	 * @param \Illuminate\Database\Eloquent\Model $model
+	 * @return $this
+	*/
 	public function setModel(Model $model)
 	{
 		$driver = $this->driver;
@@ -59,6 +96,10 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @throws \ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException
+	 * @return \Illuminate\Database\Eloquent\Model
+	*/
 	public function getModel()
 	{
 		$this->isDriverSet();
@@ -67,6 +108,11 @@ class ProlificHueModel // implements ModelInterface
 		return $this->model;
 	}
 
+	/**
+	 * @param \Illuminate\Support\Collection $items
+	 * @throws \ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException
+	 * @return $this
+	*/
 	public function setCollection(Collection $items)
 	{
 		$driver = $this->driver;
@@ -76,6 +122,10 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @return Illuminate\Support\Collection
+	 * @throws \ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException
+	*/
 	public function getCollection()
 	{
 		$this->isDriverSet();
@@ -88,6 +138,7 @@ class ProlificHueModel // implements ModelInterface
 	 * @param string $key
 	 * @param string|null $operator
 	 * @param string|null $value
+	 * @return $this
 	*/
 	public function where(string $key, string $operator = null, string $value = null)
 	{
@@ -103,6 +154,7 @@ class ProlificHueModel // implements ModelInterface
 	 * @param string $key
 	 * @param string|null $operator
 	 * @param string|null $value
+	 * @return $this
 	*/
 	public function whereDate(string $key, string $operator, string $value = null)
 	{
@@ -111,8 +163,6 @@ class ProlificHueModel // implements ModelInterface
 			$value = $operator;
 			$operator = '=';
 		}
-
-		// $value = Carbon::parse( $value );
 
 		if($driver === Rule::DB_DRIVER){
 			// $value = $value->format('Y-m-d');
@@ -124,6 +174,12 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @param string $key
+	 * @param string $fromDate
+	 * @param string|null $toDate
+	 * @return $this
+	*/
 	public function whereDateBetween(string $key, string $fromDate, string $toDate = null)
 	{
 		if(empty($toDate))
@@ -132,21 +188,40 @@ class ProlificHueModel // implements ModelInterface
 		return $this->whereDate($key, '>=', $fromDate)->whereDate($key, '<=', $toDate);
 	}
 
+	/**
+	 * @param string $key
+	 * @param string $from
+	 * @param string $to
+	 * @return $this
+	*/
 	public function whereBetween(string $key, string $from, string $to)
 	{
 		return $this->where($key, '>=', $from)->where($key, '<=', $to);
 	}
 
+	/**
+	 * @param string $key
+	 * @return $this
+	*/
 	public function whereNull(string $key)
 	{
 		return $this->where($key, '=', NULL);
 	}
 
+	/**
+	 * @param string $key
+	 * @return $this
+	*/
 	public function whereNotNull(string $key)
 	{
 		return $this->where($key, '!=', NULL);
 	}
 
+	/**
+	 * @param string $key
+	 * @param array $values
+	 * @return $this
+	*/
 	public function whereIn(string $key, array $values)
 	{
 		$driver = $this->getDriver();
@@ -157,6 +232,11 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @param string $key
+	 * @param array $values
+	 * @return $this
+	*/
 	public function whereNotIn(string $key, array $values)
 	{
 		$driver = $this->getDriver();
@@ -167,6 +247,11 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @param string $key
+	 * @param string|null $dir
+	 * @return $this
+	*/
 	public function orderBy(string $key, string $dir = null)
 	{
 		$driver = $this->getDriver();
@@ -190,6 +275,10 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @param integer $limit
+	 * @return $this
+	*/
 	public function take(int $limit)
 	{
 		$driver = $this->getDriver();
@@ -201,6 +290,10 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @param integer $offset
+	 * @return $this
+	*/
 	public function skip(int $offset)
 	{
 		$driver = $this->getDriver();
@@ -212,26 +305,43 @@ class ProlificHueModel // implements ModelInterface
 		return $this;
 	}
 
+	/**
+	 * @param integer $limit
+	 * @return $this
+	*/
 	public function limit(int $limit)
 	{
 		return $this->take($limit);
 	}
 
+	/**
+	 * @param integer $offset
+	 * @return $this
+	*/
 	public function offset(int $offset)
 	{
 		return $this->skip($offset);
 	}
 
+	/**
+	 * @return $this
+	*/
 	public function latest()
 	{
 		return $this->orderBy('created_at', Rule::SORT_ORDER_DESC);
 	}
 
+	/**
+	 * @return \Illuminate\Database\Eloquent\Collection
+	*/
 	public function get()
 	{
 		$driver = $this->getDriver();
 		if($driver === Rule::DB_DRIVER)
 			return $this->model->get();
+
+		$m = config('modelauditlogger.model');
+		$m = new $m;
 
 		if($driver === Rule::COLLECTION_DRIVER)
 		{
@@ -241,16 +351,16 @@ class ProlificHueModel // implements ModelInterface
 			if(isset($this->queueActions['take']))
 				$this->items = $this->items->take($this->queueActions['take']);
 
-			$m = config('modelauditlogger.model');
-			$m = new $m;
 			return $m->hydrate($this->items->values()->all());
 		}
 		
-
-		return null;
+		return $m->hydrate([]);
 
 	}
 
+	/**
+	 * @return integer
+	*/
 	public function count()
 	{
 		$driver = $this->getDriver();
