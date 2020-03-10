@@ -130,9 +130,9 @@ class LogGenerator
 
 		if($disk->exists($path)){
 			if($disk->getSize($path) > 0)
-				$content = $content . ',';
+				$content = ',' . $content;
 
-			$disk->prepend($path, $content);
+			$disk->append($path, $content);
 		}
 		else
 			$disk->put($path, $content);

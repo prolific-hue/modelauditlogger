@@ -7,7 +7,7 @@ use ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemAdapter;
 use ProlificHue\ModelAuditLogger\Models\ProlificHueModel;
 use ProlificHue\ModelAuditLogger\Rule;
 use Illuminate\Support\Collection;
@@ -115,7 +115,7 @@ class AuditLogRepository
 
 			$logs = Collection::make();
 			foreach ($dates as $date) {
-				$logs->merge($this->setArchivedDateLogs($storage, $path, $date));
+				$logs = $logs->merge($this->setArchivedDateLogs($storage, $path, $date));
 			}
 
 			return ProlificHueModel::make(Rule::COLLECTION_DRIVER)
@@ -127,17 +127,17 @@ class AuditLogRepository
 	}
 	
 	/**
-	 * @param \Illuminate\Filesystem\Filesystem $storage 
+	 * @param \Illuminate\Filesystem\FilesystemAdapter $storage 
 	 * @param string $archive_path
 	 * @param string $date
-	 * @return void
+	 * @return array
 	*/
-	private function setArchivedDateLogs(Filesystem $storage, string $archive_path, string $date)
+	private function setArchivedDateLogs(FilesystemAdapter $storage, string $archive_path, string $date)
 	{
 		$path = $archive_path . DIRECTORY_SEPARATOR . $date . DIRECTORY_SEPARATOR . $this->table . DIRECTORY_SEPARATOR . $this->table_id . '.log';
 		
 		if(!$storage->exists($path))
-			return;
+			return [];
 
 		$logs = json_decode('['.$storage->get($path).']', true);
 		$logs = array_map(function($log) use($date){

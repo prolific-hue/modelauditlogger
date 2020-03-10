@@ -119,10 +119,6 @@ class ArchiveAuditLogsCommand extends Command
 
         unset($tmps);
 
-        $this->info(json_encode($files));
-        $this->info(json_encode($archive_files));
-        // return;
-
         foreach ($files as $fileName => $filePath) {
             if($storage->getSize($filePath) < 0)
                 continue;

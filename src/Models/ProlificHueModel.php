@@ -71,7 +71,7 @@ class ProlificHueModel implements ModelInterface
 	/**
 	 * @throws \ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException
 	*/
-	private function isDriverSet()
+	public function isDriverSet()
 	{
 		if(empty( $this->driver ))
 			throw new AuditLoggerException('You need to call setDriver method first.');

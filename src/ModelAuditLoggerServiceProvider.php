@@ -34,18 +34,27 @@ class ModelAuditLoggerServiceProvider extends ServiceProvider
             ]);
         }
 
+        /**
+         * Pusblish configuration file
+        */
         $this->publishes([
             __DIR__.'/config/modelauditlogger.php' => config_path('modelauditlogger.php', 'config'),
         ]);
 
+        /**
+         * Pusblish Model file
+        */
         $this->publishes([
             __DIR__.'/Models/AuditTrailLog.php.stub' => app_path('AuditTrailLog.php', 'model'),
         ]);
 
+        /**
+         * Pusblish migration file
+        */
         if(config('modelauditlogger.default') === 'database'){
             $this->publishes([
                 __DIR__.'/database/migrations/create_table_audit_trail_logs.php.stub' => $this->getMigrationFileName($filesystem),
-            ], 'migrations');   
+            ], 'migrations');
         }
 
         Helpers::driverCheck();

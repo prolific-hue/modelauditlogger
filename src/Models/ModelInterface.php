@@ -8,31 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 interface ModelInterface
 {
 	/**
-	 * Illuminate\Support\Collection $items	
-	*/
-	private $items;
-
-	/**
-	 * Illuminate\Database\Eloquent\Model $model
-	*/
-	private $model;
-
-	/**
-	 * string $driver
-	*/
-	private $driver;
-
-	/**
-	 * array $queueActions
-	*/
-	private $queueActions = []; 
-
-	/**
-	 * @param string $driver
-	*/
-	private function __construct(string $driver);
-
-	/**
 	 * @param string $driver
 	 * @return self new instance
 	*/
@@ -53,7 +28,7 @@ interface ModelInterface
 	/**
 	 * @throws \ProlificHue\ModelAuditLogger\Exceptions\AuditLoggerException
 	*/
-	private function isDriverSet();
+	public function isDriverSet();
 
 	/**
 	 * @param \Illuminate\Database\Eloquent\Model $model

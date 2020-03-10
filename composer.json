@@ -34,7 +34,11 @@
         "laravel": {
             "providers": [
                 "ProlificHue\\ModelAuditLogger\\ModelAuditLoggerServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "GenerateUpdateLogs": "ProlificHue\\ModelAuditLogger\\Traits\\GenerateUpdateLogs",
+                "ModelLogRemark": "ProlificHue\\ModelAuditLogger\\Log"
+            }
         }
     },
     "minimum-stability": "dev",
